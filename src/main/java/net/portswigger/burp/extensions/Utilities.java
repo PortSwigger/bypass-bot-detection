@@ -12,10 +12,12 @@ import burp.api.montoya.ui.contextmenu.MessageEditorHttpRequestResponse;
 import com.google.gson.Gson;
 import net.portswigger.burp.extensions.beens.*;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -53,14 +55,28 @@ public class Utilities {
         String serializedTLSSettings = gson.toJson(currentTLSSettings);
         importProject(serializedTLSSettings);
     }
-
-    static void importProject(String serializedSettings) {
-        montoyaApi.burpSuite().importProjectOptionsFromJson(serializedSettings);
+    static void updateProxySettingsSync(MatchAndReplace rule) {
+        String proxy = montoyaApi.burpSuite().exportProjectOptionsAsJson("proxy.match_replace_rules");
+        ProxySettings currentProxySettings = gson.fromJson(proxy, ProxySettings.class);
+        ProxySettings changedProxySettings = currentProxySettings.toggleMatchAndReplace(rule);
+        String serializedProxySettings = gson.toJson(changedProxySettings);
+        montoyaApi.burpSuite().importProjectOptionsFromJson(serializedProxySettings);
+    }
+    static void updateTLSSettingsSync(String[] protocols, String[] ciphers) {
+        String project_settings = montoyaApi.burpSuite().exportProjectOptionsAsJson("project_options");
+        TLSSettings currentTLSSettings = gson.fromJson(project_settings, TLSSettings.class);
+        currentTLSSettings.addProtocols(protocols);
+        currentTLSSettings.addCiphers(ciphers);
+        String serializedTLSSettings = gson.toJson(currentTLSSettings);
+        montoyaApi.burpSuite().importProjectOptionsFromJson(serializedTLSSettings);
     }
 
-    static void warmTLSSettings() {
-        String project_settings = Utilities.readResourceForClass("/project_options.json", Utilities.class);
-        montoyaApi.burpSuite().importProjectOptionsFromJson(project_settings);
+    static void importProject(String serializedSettings) {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                montoyaApi.burpSuite().importProjectOptionsFromJson(serializedSettings);
+            });
+        } catch (Exception ignored){}
     }
 
 
@@ -99,7 +115,7 @@ public class Utilities {
 
     public static boolean doesHostExist(String urlString) {
         try {
-            URL url = new URL(urlString);
+            URI url = new URI(urlString);
             String host = url.getHost();
             InetAddress address = InetAddress.getByName(host);
             return address != null;
@@ -126,7 +142,7 @@ public class Utilities {
     }
 
     static boolean compareResponses(HttpRequestResponse baseRequest, HttpRequestResponse comparableResponse) {
-        if (baseRequest.response() == null || comparableResponse == null) return false;
+        if (baseRequest.response() == null || comparableResponse.response() == null) return false;
         double P = 0.1;
         int b = 0;
         int c = 0;

@@ -65,8 +65,8 @@ public class TLSContextMenuItemsProvider implements ContextMenuItemsProvider {
 
 
     public void addTLSCiphers(Browsers browser){
-        Utilities.updateTLSSettings(Constants.BROWSERS_PROTOCOLS.get(browser.name), Constants.BROWSERS_CIPHERS.get(browser.name));
-        Utilities.updateProxySettings(MatchAndReplace.create(browser));
+        Utilities.updateTLSSettingsSync(Constants.BROWSERS_PROTOCOLS.get(browser.name), Constants.BROWSERS_CIPHERS.get(browser.name));
+        Utilities.updateProxySettingsSync(MatchAndReplace.create(browser));
     }
     public void addManualSettings(String negotiation){
         Utilities.importProject(negotiation);

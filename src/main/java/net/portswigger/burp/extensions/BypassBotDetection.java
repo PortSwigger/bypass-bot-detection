@@ -2,6 +2,8 @@ package net.portswigger.burp.extensions;
 
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
+import net.portswigger.burp.extensions.beens.Browsers;
+import net.portswigger.burp.extensions.beens.MatchAndReplace;
 
 import javax.swing.*;
 import java.util.concurrent.BlockingQueue;
@@ -32,13 +34,8 @@ public class BypassBotDetection implements BurpExtension {
             });
             // warming up
             Utilities.log(Utilities.getResourceString("loading"));
-            String project_settings = Utilities.readResourceForClass("/project_options.json", BypassBotDetection.class);
-            SwingUtilities.invokeAndWait(() -> {
-                if(project_settings!=null) {
-                    Utilities.importProject(project_settings);
-                }
-            });
-            Utilities.loadTLSSettings();
+            Utilities.updateTLSSettings(Constants.BROWSERS_PROTOCOLS.get(Browsers.FIREFOX.name), Constants.BROWSERS_CIPHERS.get(Browsers.FIREFOX.name));
+            Utilities.updateProxySettings(MatchAndReplace.create(Browsers.FIREFOX));
 
 
         } catch (Exception e) {

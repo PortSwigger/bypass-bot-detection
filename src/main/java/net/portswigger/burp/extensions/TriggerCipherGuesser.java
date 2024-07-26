@@ -2,6 +2,8 @@ package net.portswigger.burp.extensions;
 
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.http.message.HttpRequestResponse;
+import net.portswigger.burp.extensions.beens.Browsers;
+import net.portswigger.burp.extensions.beens.MatchAndReplace;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,7 +69,8 @@ public class TriggerCipherGuesser implements ActionListener, Runnable {
                         Utilities.log(e.getMessage());
                     }
                     finally {
-                        Utilities.loadTLSSettings();
+                        Utilities.updateTLSSettingsSync(Constants.BROWSERS_PROTOCOLS.get(Browsers.FIREFOX.name), Constants.BROWSERS_CIPHERS.get(Browsers.FIREFOX.name));
+                        Utilities.updateProxySettingsSync(MatchAndReplace.create(Browsers.FIREFOX));
                     }
                 }
             });
