@@ -33,7 +33,7 @@ public class BypassBotDetection implements BurpExtension {
             // warming up
             Utilities.log(Utilities.getResourceString("loading"));
             String project_settings = Utilities.readResourceForClass("/project_options.json", BypassBotDetection.class);
-            SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeAndWait(() -> {
                 if(project_settings!=null) {
                     Utilities.importProject(project_settings);
                 }
