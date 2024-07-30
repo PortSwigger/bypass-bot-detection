@@ -2,7 +2,7 @@
 Burp Suite extension that mutates ciphers to bypass TLS-fingerprint based bot detection
 
 ## Usage
-1. Install the extension from [Releses](https://github.com/PortSwigger/bypass-bot-detection/releases) or build from sources.
+1. Install the extension from [Releases](https://github.com/PortSwigger/bypass-bot-detection/releases) or build from sources.
 2. The extension changes network settings at Settings -> Network -> TLS and select `Use custom protocols and cipher`.
 3. Right-click on a Request/Response item in the Proxy History tab, navigate to Extensions -> Bypass bot detection, and select one of the menu items.
 4. If the server's response changes (i.e., the number of words and headers are different), the extension will log the message and add notes to the Proxy History.
@@ -24,3 +24,5 @@ Burp Suite extension that mutates ciphers to bypass TLS-fingerprint based bot de
 
 ## Warning
 The extension modifies network settings during brute force attacks. It is not recommended to use this extension concurrently with other active scans.
+
+This extension cannot bypass aggressive bot detection
