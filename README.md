@@ -7,6 +7,8 @@ Burp Suite extension that mutates ciphers to bypass TLS-fingerprint based bot de
 3. Right-click on a Request/Response item in the Proxy History tab, navigate to Extensions -> Bypass bot detection, and select one of the menu items.
 4. If the server's response changes (i.e., the number of words and headers are different), the extension will log the message and add notes to the Proxy History.
 
+<img src="gitimg/bypass-bot-detection.gif" width="600"/>
+
 ## Build Instructions
 * Ensure that Java JDK 17 or newer is installed
 * From root of project, run the command `./gradlew jar`
