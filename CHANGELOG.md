@@ -9,3 +9,8 @@
 
 ### Fixed
 - Fixed the issue where proxy settings were not restored to defaults after the extension was unloaded.
+
+## [0.0.3] - 2024-07-30
+
+### Fixed
+- Fixed the issue with action listener on Swig Utils

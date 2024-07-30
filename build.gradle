@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'net.portswigger.burp.extensions'
-version = '0.0.2'
+version = '0.0.3'
 description = 'bypass-bot-detection'
 
 repositories {
