@@ -82,12 +82,16 @@ public class Utilities {
 
     static void saveTLSSettings() {
         String project_settings = montoyaApi.burpSuite().exportProjectOptionsAsJson("project_options");
-        montoyaApi.persistence().preferences().setString(Utilities.getResourceString("preferences"), project_settings);
+        String proxy_settings = montoyaApi.burpSuite().exportProjectOptionsAsJson("proxy.match_replace_rules");
+        montoyaApi.persistence().preferences().setString(Utilities.getResourceString("network_preferences"), project_settings);
+        montoyaApi.persistence().preferences().setString(Utilities.getResourceString("proxy_preferences"), proxy_settings);
     }
 
     static void loadTLSSettings() {
-        String project_settings = montoyaApi.persistence().preferences().getString(Utilities.getResourceString("preferences"));
+        String project_settings = montoyaApi.persistence().preferences().getString(Utilities.getResourceString("network_preferences"));
+        String proxy_settings = montoyaApi.persistence().preferences().getString(Utilities.getResourceString("proxy_preferences"));
         montoyaApi.burpSuite().importProjectOptionsFromJson(project_settings);
+        montoyaApi.burpSuite().importProjectOptionsFromJson(proxy_settings);
     }
 
     static void log(String message) {

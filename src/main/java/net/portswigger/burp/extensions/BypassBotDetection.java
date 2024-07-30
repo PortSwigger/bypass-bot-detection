@@ -33,9 +33,18 @@ public class BypassBotDetection implements BurpExtension {
                 }
             });
             // warming up
-            Utilities.log(Utilities.getResourceString("loading"));
-            Utilities.updateTLSSettings(Constants.BROWSERS_PROTOCOLS.get(Browsers.FIREFOX.name), Constants.BROWSERS_CIPHERS.get(Browsers.FIREFOX.name));
-            Utilities.updateProxySettings(MatchAndReplace.create(Browsers.FIREFOX));
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                // Load settings
+                Utilities.log(Utilities.getResourceString("loading"));
+                Utilities.updateTLSSettings(Constants.BROWSERS_PROTOCOLS.get(Browsers.FIREFOX.name), Constants.BROWSERS_CIPHERS.get(Browsers.FIREFOX.name));
+                Utilities.updateProxySettings(MatchAndReplace.create(Browsers.FIREFOX));
+            });
+            thread.start();
 
 
         } catch (Exception e) {

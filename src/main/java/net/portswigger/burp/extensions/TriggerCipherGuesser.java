@@ -35,6 +35,7 @@ public class TriggerCipherGuesser implements ActionListener, Runnable {
                 public void run() {
                     try {
                         Utilities.log(String.format("|*| Starting attack on %s targets", requestResponses.size()));
+                        Utilities.loadTLSSettings();
                         ListIterator<HttpRequestResponse> it = requestResponses.listIterator();
                         for(String[] protocol : Constants.BRUTEFORCE_CIPHERS.keySet()) {
                             if(!it.hasNext()) {
