@@ -69,6 +69,6 @@ public class TLSContextMenuItemsProvider implements ContextMenuItemsProvider {
         Utilities.updateProxySettingsSync(MatchAndReplace.create(browser));
     }
     public void addManualSettings(String negotiation){
-        Utilities.importProject(negotiation);
+        Utilities.montoyaApi.burpSuite().importProjectOptionsFromJson(negotiation);
     }
 }
