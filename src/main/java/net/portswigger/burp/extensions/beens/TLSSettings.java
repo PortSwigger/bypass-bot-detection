@@ -27,4 +27,15 @@ public class TLSSettings {
         ssl.setNegotiation(negotiation);
         this.project_options.setSsl(ssl);
     }
+
+    public void toggleHTTPSettings() {
+        HTTP http = this.project_options.getHTTP();
+        boolean enabled = http.getHttp2().getEnableHTTP2();
+        http.setHttp2(new HTTP2(!enabled));
+        this.project_options.setHTTP(http);
+    }
+
+    public boolean enabledHTTPDowngrade() {
+        return this.project_options.getHTTP().getHttp2().getEnableHTTP2();
+    }
 }

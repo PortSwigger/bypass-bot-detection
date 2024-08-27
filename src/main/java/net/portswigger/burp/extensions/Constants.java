@@ -5,18 +5,63 @@ import java.util.Map;
 
 public class Constants {
 
-    public static int THREAD_POOL_SIZE = 1;
 
+    public static int MAX_ATTEMPTS = 3;
     public static String BURP_TLS_NEGOTIATION = "use_custom";
     public static String MATCH_AND_REPLACE_RULE_TYPE = "request_header";
     public static String MATCH_AND_REPLACE_REGEXP = "^User-Agent.*$";
-    public static String FIREFOX_UA = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0";
 
+    public static String[] MATCH_AND_REPLACE_REGEXP_HTTP2 = new String[] {
+            "^Sec-Ch-Ua:.*$",
+            "^Sec-Ch-Ua-Mobile:.*$",
+            "^Sec-Ch-Ua-Platform:.*$",
+            "^Sec-Fetch-Site:.*$",
+            "^Sec-Fetch-Mode:.*$",
+            "^Sec-Fetch-User:.*$",
+            "^Sec-Fetch-Dest:.*$",
+//            "^Sec-CH-UA-Arch:.*$",
+//            "^Sec-CH-UA-Bitness:.*$",
+//            "^Sec-CH-UA-Model:.*$",
+//            "^Sec-CH-UA-Platform-Version:.*$",
+//            "^Sec-CH-UA-Form-Factors:.*$",
+//            "^Sec-CH-UA-Full-Version-List:.*$",
+//            "^Sec-CH-UA-WoW64:.*$",
+//            "^Priority:.*$"
+    };
+    public static String FROZEN_UA = "User-Agent: Mozilla/5.0 (%s) %s";
+
+    public static Map<String,String> FIREFOX_PLATFORMS = Map.of(
+            "Windows",
+            "Windows NT 10.0; Win64; x64; rv:129.0",
+            "Mac",
+            "Macintosh; Intel Mac OS X 14.6; rv:129.0",
+            "Linux",
+            "X11; Linux x86_64; rv:129.0");
+    public static Map<String,String> CHROME_PLATFORMS = Map.of(
+            "Windows",
+            "Windows NT 10.0; Win64; x64",
+            "Mac",
+            "Macintosh; Intel Mac OS X 10_15_7",
+            "Linux",
+            "X11; Linux x86_64");
+    public static Map<String,String> SAFARI_PLATFORMS = Map.of(
+            "Windows",
+            "Macintosh; Intel Mac OS X 10_15_7",
+            "Mac",
+            "Macintosh; Intel Mac OS X 10_15_7",
+            "Linux",
+            "Macintosh; Intel Mac OS X 10_15_7");
+    // Platforms
+    public static Map<String,Map<String,String>> BROWSERS_PLATFORMS = Map.of(
+            "Firefox", FIREFOX_PLATFORMS,
+            "Chrome", CHROME_PLATFORMS,
+            "Safari", SAFARI_PLATFORMS
+    );
     // Browsers
     public static Map<String,String> BROWSERS_USER_AGENTS = Map.of(
-            "Firefox", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
-            "Chrome", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-            "Safari", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15"
+            "Firefox", "User-Agent: Mozilla/5.0 (%s) Gecko/20100101 Firefox/129.0",
+            "Chrome", "User-Agent: Mozilla/5.0 (%s) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+            "Safari", "User-Agent: Mozilla/5.0 (%s) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15"
     );
     public static Map<String,String[]> BROWSERS_PROTOCOLS = Map.of(
             "Firefox", new String[]{"TLSv1.2", "TLSv1.3"},

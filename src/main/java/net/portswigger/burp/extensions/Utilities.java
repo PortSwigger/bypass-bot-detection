@@ -2,8 +2,12 @@ package net.portswigger.burp.extensions;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.Annotations;
+import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.core.HighlightColor;
+import burp.api.montoya.http.HttpMode;
+import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.HttpRequestResponse;
+import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.http.message.responses.analysis.Attribute;
 import burp.api.montoya.proxy.ProxyHistoryFilter;
@@ -19,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -67,6 +72,25 @@ public class Utilities {
         TLSSettings currentTLSSettings = gson.fromJson(project_settings, TLSSettings.class);
         currentTLSSettings.addProtocols(protocols);
         currentTLSSettings.addCiphers(ciphers);
+        String serializedTLSSettings = gson.toJson(currentTLSSettings);
+        montoyaApi.burpSuite().importProjectOptionsFromJson(serializedTLSSettings);
+    }
+    static boolean enabledHTTPDowngrade() {
+        String project_settings = montoyaApi.burpSuite().exportProjectOptionsAsJson("project_options");
+        TLSSettings currentTLSSettings = gson.fromJson(project_settings, TLSSettings.class);
+        return currentTLSSettings.enabledHTTPDowngrade();
+    }
+    static void updateHTTPSettings() {
+        List<MatchAndReplace> rules = MatchAndReplace.createDowngradeRules();
+        String proxy = montoyaApi.burpSuite().exportProjectOptionsAsJson("proxy.match_replace_rules");
+        ProxySettings currentProxySettings = gson.fromJson(proxy, ProxySettings.class);
+        ProxySettings changedProxySettings = currentProxySettings.toggleHTTPDowngradeMatchAndReplace(rules);
+        String serializedProxySettings = gson.toJson(changedProxySettings);
+        montoyaApi.burpSuite().importProjectOptionsFromJson(serializedProxySettings);
+
+        String project_settings = montoyaApi.burpSuite().exportProjectOptionsAsJson("project_options");
+        TLSSettings currentTLSSettings = gson.fromJson(project_settings, TLSSettings.class);
+        currentTLSSettings.toggleHTTPSettings();
         String serializedTLSSettings = gson.toJson(currentTLSSettings);
         montoyaApi.burpSuite().importProjectOptionsFromJson(serializedTLSSettings);
     }
@@ -145,13 +169,35 @@ public class Utilities {
         }
     }
 
-    static boolean compareResponses(HttpRequestResponse baseRequest, HttpRequestResponse comparableResponse) {
-        if (baseRequest.response() == null || comparableResponse.response() == null) return false;
-        double P = 0.1;
+    static HttpRequestResponse unpredictable(List<HttpRequestResponse> comparableResponses) {
+        HttpRequestResponse etalon = null;
+        double P = 0.2;
+        int base = -1;
+        for(HttpRequestResponse requestResponse: comparableResponses) {
+            if (requestResponse.hasResponse() && requestResponse.response() != null) {
+                Optional<Integer> words = requestResponse.response().attributes(WORD_COUNT).stream().map(Attribute::value).findFirst();
+                if (words.isPresent()) {
+                    if (base == -1) {
+                        base = words.get();
+                        etalon = requestResponse;
+                    } else {
+                        int diff = Math.abs(base - words.get());
+                        if (diff > Math.abs(base) * P) etalon = requestResponse;
+                    }
+                }
+            }
+        }
+        return etalon;
+    }
+
+    static boolean compareResponses(HttpRequestResponse baseRequest, List<HttpRequestResponse> comparableResponses) {
+        HttpRequestResponse requestResponse = unpredictable(comparableResponses);
+        if (baseRequest.response() == null || requestResponse == null) return false;
+        double P = 0.2;
         int b = 0;
         int c = 0;
         List<Attribute> baseAttributes = baseRequest.response().attributes(WORD_COUNT);
-        List<Attribute> comparableAttributes = comparableResponse.response().attributes(WORD_COUNT);
+        List<Attribute> comparableAttributes = requestResponse.response().attributes(WORD_COUNT);
         Optional<Integer> baseWordCount = baseAttributes.stream().map(Attribute::value).findFirst();
         Optional<Integer> comparableWordCount = comparableAttributes.stream().map(Attribute::value).findFirst();
         if (baseWordCount.isPresent() && comparableWordCount.isPresent()) {
@@ -159,7 +205,7 @@ public class Utilities {
             c = comparableWordCount.get();
         } else {
             b = baseRequest.response().headers().size();
-            c = comparableResponse.response().headers().size();
+            c = requestResponse.response().headers().size();
         }
         int diff = Math.abs(b - c);
         return diff > Math.abs(b) * P || diff > Math.abs(c) * P;
@@ -194,7 +240,7 @@ public class Utilities {
         });
         items.forEach(item -> {
             item.annotations().setNotes(comments);
-            item.annotations().setHighlightColor(HighlightColor.GREEN);
+            item.annotations().setHighlightColor(HighlightColor.RED);
         });
     }
     static String getComment(HttpRequestResponse baseRequest) {

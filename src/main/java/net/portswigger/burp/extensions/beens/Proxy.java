@@ -45,4 +45,19 @@ public class Proxy {
         }
         setMatchReplaceRules(existing.toArray(new MatchAndReplace[0]));
     }
+    public void toggleHTTPDowngradeMatchAndReplace(List<MatchAndReplace> rules){
+        List<MatchAndReplace> existing = new ArrayList<>(List.of(this.match_replace_rules));
+        for(MatchAndReplace rule: rules) {
+            Optional<MatchAndReplace> found = existing.stream().filter(r -> r.filterByComment(rule)).findFirst();
+            if (found.isEmpty()) {
+                existing.add(rule);
+            } else {
+                MatchAndReplace availableRule = found.get();
+                existing.remove(availableRule);
+                availableRule.setEnabled(!availableRule.isEnabled());
+                existing.add(availableRule);
+            }
+        }
+        setMatchReplaceRules(existing.toArray(new MatchAndReplace[0]));
+    }
 }
