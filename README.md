@@ -22,6 +22,7 @@ Burp Suite extension that mutates ciphers to bypass TLS-fingerprint based bot de
 - **Firefox Mode**: Install the following list of cipher suites: 4865, 4867, 4866, 49195, 49199, 52393, 52392, 49196, 49200, 49162, 49161, 49171, 49172, 156, 157, 47, 53 and add the Firefox User-Agent header.
 - **Chrome Mode**: Use cipher suites 4865, 4866, 4867, 49195, 49199, 49196, 49200, 52393, 52392, 49171, 49172, 156, 157, 47, 53 and add the Chrome User-Agent header.
 - **Safari Mode**: Include cipher suites 4865, 4866, 4867, 49196, 49195, 52393, 49200, 49199, 52392, 49162, 49161, 49172, 49171, 157, 156, 53, 47, 49160, 49170, 10 and add the Safari User-Agent header.
+- **HTTP2 Downgrade**: By default, Burp uses HTTP/2 to communicate with all servers that advertise support for it during the TLS handshake. When that feature is selected, the Burp Suite will use HTTP/1 even if the server supports HTTP/2. It allows to bypass aggressive HTTP/2 fingerprinting.
 - **Brute Force Mode**: Tries different combinations of TLS protocol versions and cipher suites. For a full list, visit: [PortSwigger/bypass-bot-detection](https://github.com/PortSwigger/bypass-bot-detection/blob/d677ad52a3cad97aa51b39b66976e35490cef76d/src/main/java/net/portswigger/burp/extensions/Constants.java#L88).
 
 ## Warning

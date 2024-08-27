@@ -3,6 +3,10 @@ package net.portswigger.burp.extensions.beens;
 import com.google.gson.annotations.Expose;
 import net.portswigger.burp.extensions.Constants;
 
+import java.util.*;
+
+import static net.portswigger.burp.extensions.Constants.*;
+
 public class MatchAndReplace {
     private @Expose String comment;
     private @Expose boolean enabled;
@@ -20,14 +24,33 @@ public class MatchAndReplace {
         this.string_replace = string_replace;
     }
 
+    public static List<MatchAndReplace> createDowngradeRules(){
+        List<MatchAndReplace> rules = new ArrayList<>();
+        for(String header : MATCH_AND_REPLACE_REGEXP_HTTP2) {
+            rules.add(new MatchAndReplace(
+                    String.format("HTTP2 Header %s downgrade rule", header),
+                    true,
+                    false,
+                    Constants.MATCH_AND_REPLACE_RULE_TYPE,
+                    header,
+                    ""
+            ));
+        }
+        return rules;
+    }
+
     public static MatchAndReplace create(Browsers browser){
+        String platform = System.getProperty("os.name","Windows");
+        OS optionalOS = Arrays.stream(OS.values()).filter(os -> platform.contains(os.name)).findFirst().get();
+        String format = BROWSERS_USER_AGENTS.get(browser.name);
+        String value = BROWSERS_PLATFORMS.get(browser.name).get(optionalOS.name);
         return new MatchAndReplace(
                 String.format("Emulate %s User-Agent", browser.name),
                 true,
                 false,
                 Constants.MATCH_AND_REPLACE_RULE_TYPE,
                 Constants.MATCH_AND_REPLACE_REGEXP,
-                Constants.BROWSERS_USER_AGENTS.get(browser.name)
+                String.format(format,value)
         );
     }
     public boolean filterByComment(MatchAndReplace filter) {

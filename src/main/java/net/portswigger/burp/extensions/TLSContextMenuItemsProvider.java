@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 public class TLSContextMenuItemsProvider implements ContextMenuItemsProvider {
     private ThreadPoolExecutor taskEngine;
@@ -51,6 +50,10 @@ public class TLSContextMenuItemsProvider implements ContextMenuItemsProvider {
                         menuItemList.add(item);
                     }
             );
+            String menuLabel = Utilities.enabledHTTPDowngrade() ? "Enable " : "Disable ";
+            JMenuItem downgradeMenu = new JMenuItem(menuLabel + Utilities.getResourceString("menu_downgrade"));
+            downgradeMenu.addActionListener(e -> downgradeHttp());
+            menuItemList.add(downgradeMenu);
 
             JMenuItem item = new JMenuItem(Utilities.getResourceString("menu_brute_force"));
             item.addActionListener(new TriggerCipherGuesser(taskEngine, requestResponses));
@@ -63,7 +66,9 @@ public class TLSContextMenuItemsProvider implements ContextMenuItemsProvider {
         return null;
     }
 
-
+    public void downgradeHttp(){
+        Utilities.updateHTTPSettings();
+    }
     public void addTLSCiphers(Browsers browser){
         Utilities.updateTLSSettingsSync(Constants.BROWSERS_PROTOCOLS.get(browser.name), Constants.BROWSERS_CIPHERS.get(browser.name));
         Utilities.updateProxySettingsSync(MatchAndReplace.create(browser));

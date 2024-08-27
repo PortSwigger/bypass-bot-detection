@@ -2,15 +2,20 @@ package net.portswigger.burp.extensions;
 
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.http.message.HttpRequestResponse;
+import burp.api.montoya.http.message.responses.HttpResponse;
 import net.portswigger.burp.extensions.beens.Browsers;
 import net.portswigger.burp.extensions.beens.MatchAndReplace;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
+
+import static net.portswigger.burp.extensions.Constants.MAX_ATTEMPTS;
 
 public class TriggerCipherGuesser implements ActionListener, Runnable {
     private ThreadPoolExecutor taskEngine;
@@ -48,12 +53,20 @@ public class TriggerCipherGuesser implements ActionListener, Runnable {
                             while (it.hasNext()) {
                                 HttpRequestResponse requestResponse = it.next();
                                 String negotiation = Utilities.negotiation(protocol,ciphers);
-                                HttpRequestResponse prob = Utilities.attemptRequest(requestResponse, negotiation);
-                                if ( prob != null && Utilities.compareResponses(requestResponse, prob)) {
+                                List<HttpRequestResponse> probs = new ArrayList<>();
+                                for(int i = 0; i < MAX_ATTEMPTS; i++) {
+                                    HttpRequestResponse prob = Utilities.attemptRequest(requestResponse, negotiation);
+                                    probs.add(prob);
+                                }
+                                if ( !probs.isEmpty() && Utilities.compareResponses(requestResponse, probs)) {
                                     String comment = String.format(
                                             "|*| URL %s response was changed. Status code %s. TLS settings: %s",
                                             requestResponse.request().url(),
-                                            prob.response().statusCode(),
+                                            probs.stream()
+                                                    .map(HttpRequestResponse::response)
+                                                    .map(HttpResponse::statusCode)
+                                                    .map(String::valueOf)
+                                                    .reduce("",(partial,element) -> element + "," + partial),
                                             negotiation );
                                     Utilities.log(comment);
                                     Utilities.addComment(requestResponse,negotiation);

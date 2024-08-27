@@ -14,3 +14,8 @@
 
 ### Fixed
 - Fixed the issue with action listener on Swig Utils
+
+## [0.0.4] - 2024-08-27
+
+### Added
+- HTTP/2 to HTTP/1.1 downgrade
