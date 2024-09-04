@@ -18,8 +18,7 @@ public class BypassBotDetection implements BurpExtension {
         try {
             new Utilities(montoyaApi);
             BlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
-            int processors = Runtime.getRuntime().availableProcessors();
-            ThreadPoolExecutor taskEngine = new ThreadPoolExecutor(processors, processors*2, 1, TimeUnit.MINUTES, tasks);
+            ThreadPoolExecutor taskEngine = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, tasks);
             Utilities.saveTLSSettings();
             montoyaApi.userInterface().registerContextMenuItemsProvider(new TLSContextMenuItemsProvider(taskEngine));
             montoyaApi.logging().logToOutput(Utilities.getResourceString("greetings"));

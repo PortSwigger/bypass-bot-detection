@@ -247,7 +247,7 @@ public class Utilities {
         List<ProxyHttpRequestResponse> items = montoyaApi.proxy().history(new ProxyHistoryFilter() {
             @Override
             public boolean matches(ProxyHttpRequestResponse requestResponse) {
-                return requestResponse.finalRequest().equals(baseRequest.request()) &&
+                return requestResponse.hasResponse() && baseRequest.hasResponse() && requestResponse.originalResponse().equals(baseRequest.response()) &&
                         requestResponse.annotations().hasNotes();
             }
         });

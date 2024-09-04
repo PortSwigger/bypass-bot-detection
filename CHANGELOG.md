@@ -19,3 +19,9 @@
 
 ### Added
 - HTTP/2 to HTTP/1.1 downgrade
+
+## [0.0.5] - 2024-09-04
+
+### Fixed 
+- Fixed Firefox and Chrome User-Agent to the latest version
+- Response notes
